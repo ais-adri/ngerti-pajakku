@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com; img-src 'self' data:; style-src 'self'; form-action 'none'; base-uri 'self'">
+  <title>Kalkulator PPh 21 Tahunan — Ngerti Pajakku</title>
+  <meta name="description" content="Cek apakah PPh 21 di bukti potong Anda sudah sesuai. Dihitung langkah demi langkah dengan bahasa sehari-hari, langsung di HP Anda.">
+  <link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="module" src="/assets/kalkulator.js"></script>
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap">
+      <a class="logo" href="/">Ngerti <span>Pajakku</span></a>
+      <nav class="nav" aria-label="Menu utama">
+        <a href="/">Peta</a>
+        <a href="/kalkulator.html" aria-current="page">Kalkulator</a>
+        <a href="/kamus.html">Kamus</a>
+        <a href="/tentang.html">Tentang</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <h1>Cek PPh 21 tahunan</h1>
+    <p class="lead">Salin angka dari bukti potong tahunan Anda (BPA1). Kami hitung ulang langkah demi langkah, lalu kami beri tahu apakah hasilnya cocok.</p>
+
+    <div class="note note-info">
+      <strong>Data Anda tetap di HP ini.</strong> Hitungan berjalan di browser Anda. Angka yang Anda isi tidak dikirim atau disimpan di mana pun, dan hilang saat halaman ditutup.
+    </div>
+
+    <div class="note note-warn" id="belum-verifikasi" hidden>
+      <strong>Versi uji coba.</strong> Aturan hitung kalkulator ini sedang diperiksa ahli pajak. Gunakan hasilnya sebagai bahan belajar.
+    </div>
+
+    <form id="form" novalidate autocomplete="off">
+      <fieldset>
+        <legend>1. Tahun pajak</legend>
+        <div class="choice" id="pilih-tahun"></div>
+        <p class="small muted" id="catatan-tahun"></p>
+      </fieldset>
+
+      <fieldset id="penyaring">
+        <legend>2. Apakah kalkulator ini cocok untuk Anda?</legend>
+        <div class="q" data-q="tetap">
+          <p>Apakah Anda pegawai tetap?</p>
+          <div class="choice">
+            <label><input type="radio" name="tetap" value="ya"> Ya</label>
+            <label><input type="radio" name="tetap" value="tidak"> Tidak</label>
+          </div>
+        </div>
+        <div class="q" data-q="setahun">
+          <p>Apakah Anda bekerja penuh dari Januari sampai Desember?</p>
+          <div class="choice">
+            <label><input type="radio" name="setahun" value="ya"> Ya</label>
+            <label><input type="radio" name="setahun" value="tidak"> Tidak</label>
+          </div>
+        </div>
+        <div class="q" data-q="satu">
+          <p>Apakah Anda hanya punya satu bukti potong (satu kantor) untuk tahun itu?</p>
+          <div class="choice">
+            <label><input type="radio" name="satu" value="ya"> Ya</label>
+            <label><input type="radio" name="satu" value="tidak"> Tidak</label>
+          </div>
+        </div>
+        <div class="q" data-q="npwp">
+          <p>Apakah Anda punya NPWP, atau NIK Anda sudah terdaftar sebagai NPWP?</p>
+          <div class="choice">
+            <label><input type="radio" name="npwp" value="ya"> Ya</label>
+            <label><input type="radio" name="npwp" value="tidak"> Tidak</label>
+            <label><input type="radio" name="npwp" value="ragu"> Tidak tahu</label>
+          </div>
+        </div>
+        <div id="tolak" class="status status-tolak" hidden aria-live="polite"></div>
+      </fieldset>
+
+      <div id="isian" hidden>
+        <fieldset>
+          <legend>3. Status keluarga (PTKP)</legend>
+          <p class="small muted">Pilih status yang tercantum di bukti potong Anda. <a href="/materi/ptkp.html">Apa itu PTKP?</a></p>
+          <div class="q">
+            <p>Status kawin</p>
+            <div class="choice">
+              <label><input type="radio" name="kawin" value="0"> Tidak kawin (TK)</label>
+              <label><input type="radio" name="kawin" value="1"> Kawin (K)</label>
+            </div>
+          </div>
+          <div class="field">
+            <label for="tanggungan">Jumlah tanggungan</label>
+            <span class="hint">Anggota keluarga yang Anda tanggung, maksimal 3.</span>
+            <select id="tanggungan" name="tanggungan">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </div>
+          <p class="small muted">Status K/I, PH, atau HB belum didukung.</p>
+        </fieldset>
+
+        <fieldset>
+          <legend>4. Angka dari bukti potong</legend>
+          <div class="field" data-kolom="bruto">
+            <label for="bruto">Penghasilan bruto setahun</label>
+            <span class="hint">Jumlah seluruh penghasilan sebelum dipotong apa pun: gaji, tunjangan, lembur, bonus, THR.</span>
+            <div class="rp"><span>Rp</span><input id="bruto" name="bruto" inputmode="numeric" required></div>
+          </div>
+          <div class="field" data-kolom="iuran">
+            <label for="iuran">Iuran pensiun / JHT / THT yang Anda bayar</label>
+            <span class="hint">Isi 0 bila tidak ada.</span>
+            <div class="rp"><span>Rp</span><input id="iuran" name="iuran" inputmode="numeric" value="0"></div>
+          </div>
+          <div class="field" data-kolom="zakat">
+            <label for="zakat">Zakat yang dibayar lewat kantor</label>
+            <span class="hint">Isi 0 bila tidak ada.</span>
+            <div class="rp"><span>Rp</span><input id="zakat" name="zakat" inputmode="numeric" value="0"></div>
+          </div>
+          <div class="field" data-kolom="pph">
+            <label for="pph">PPh 21 yang tercatat di bukti potong</label>
+            <span class="hint">Pajak penghasilan setahun yang tercantum di bukti potong Anda.</span>
+            <div class="rp"><span>Rp</span><input id="pph" name="pph" inputmode="numeric" required></div>
+          </div>
+
+          <details>
+            <summary>Isi angka lain (opsional) untuk mencari letak perbedaan</summary>
+            <p class="small muted">Bila hasilnya beda, angka-angka ini membantu kami menunjukkan di langkah mana perbedaan mulai muncul.</p>
+            <div class="field" data-kolom="biayaJabatan">
+              <label for="biayaJabatan">Biaya jabatan</label>
+              <div class="rp"><span>Rp</span><input id="biayaJabatan" name="biayaJabatan" inputmode="numeric"></div>
+            </div>
+            <div class="field" data-kolom="neto">
+              <label for="neto">Penghasilan neto setahun</label>
+              <div class="rp"><span>Rp</span><input id="neto" name="neto" inputmode="numeric"></div>
+            </div>
+            <div class="field" data-kolom="ptkp">
+              <label for="ptkp">PTKP</label>
+              <div class="rp"><span>Rp</span><input id="ptkp" name="ptkp" inputmode="numeric"></div>
+            </div>
+            <div class="field" data-kolom="pkp">
+              <label for="pkp">Penghasilan kena pajak (PKP)</label>
+              <div class="rp"><span>Rp</span><input id="pkp" name="pkp" inputmode="numeric"></div>
+            </div>
+          </details>
+        </fieldset>
+
+        <button type="submit" class="btn-primary">Hitung</button>
+      </div>
+    </form>
+
+    <section id="hasil" hidden aria-live="polite" tabindex="-1"></section>
+  </main>
+
+  <footer class="site-foot">
+    <div class="wrap">
+      <p><strong>Materi edukasi, bukan konsultasi pajak.</strong> Untuk keputusan pajak Anda, rujuk sumber resmi DJP atau konsultan pajak.</p>
+      <p>Angka yang Anda isi di kalkulator tidak dikirim ke mana pun. <a href="/tentang.html#privasi">Tentang privasi</a></p>
+    </div>
+  </footer>
+</body>
+</html>
